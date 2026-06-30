@@ -35,25 +35,26 @@ set "MAVEN_PROJECTBASEDIR=%~dp0"
 @REM strip trailing backslash
 if "%MAVEN_PROJECTBASEDIR:~-1%"=="\" set "MAVEN_PROJECTBASEDIR=%MAVEN_PROJECTBASEDIR:~0,-1%"
 
-set WRAPPER_JAR="%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.jar"
+set "WRAPPER_DIR=%MAVEN_PROJECTBASEDIR%\.mvn\wrapper"
+set "WRAPPER_JAR=%WRAPPER_DIR%\maven-wrapper.jar"
 set WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
 
-set DOWNLOAD_URL="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.3.2/maven-wrapper-3.3.2.jar"
+set "DOWNLOAD_URL=https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.3.2/maven-wrapper-3.3.2.jar"
 
 @REM First-run: download the wrapper JAR if missing.
-if not exist %WRAPPER_JAR% (
-    echo Downloading Maven Wrapper from %DOWNLOAD_URL% ...
-    powershell -Command "& {[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; Invoke-WebRequest -Uri %DOWNLOAD_URL% -OutFile %WRAPPER_JAR%}"
-    if not exist %WRAPPER_JAR% (
+if not exist "%WRAPPER_JAR%" (
+    echo Downloading Maven Wrapper from "%DOWNLOAD_URL%" ...
+    powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference = 'Stop'; [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; New-Item -ItemType Directory -Force -Path '%WRAPPER_DIR%' | Out-Null; Invoke-WebRequest -Uri '%DOWNLOAD_URL%' -OutFile '%WRAPPER_JAR%'"
+    if not exist "%WRAPPER_JAR%" (
         echo ERROR: failed to download Maven Wrapper.
         goto error
     )
 )
 
-%MAVEN_JAVA_EXE% ^
+"%MAVEN_JAVA_EXE%" ^
   %JVM_CONFIG_MAVEN_PROPS% ^
   %MAVEN_OPTS% ^
-  -classpath %WRAPPER_JAR% ^
+  -classpath "%WRAPPER_JAR%" ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
   %WRAPPER_LAUNCHER% %*
 

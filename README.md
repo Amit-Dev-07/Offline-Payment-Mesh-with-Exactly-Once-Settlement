@@ -386,6 +386,35 @@ For a college / portfolio project: name the concept honestly as **"mesh-routed d
 
 ---
 
+## Frontend development
+
+The dashboard is now a React app under `frontend/`.
+
+Common commands:
+
+```cmd
+cd frontend
+npm install
+npm run dev
+```
+
+The Vite dev server proxies `/api` to the Spring Boot backend on port 8080.
+
+To rebuild the React bundle that Spring Boot serves from `/`:
+
+```cmd
+cd frontend
+npm run build
+```
+
+The production build is emitted into `src/main/resources/static`. You can also run the combined Maven profile:
+
+```cmd
+mvnw.cmd -Pfrontend package
+```
+
+---
+
 ## Troubleshooting
 
 **`java: command not found`** — Install JDK 17+. On Windows, `winget install EclipseAdoptium.Temurin.17.JDK` or download from adoptium.net.

@@ -28,6 +28,7 @@ WRAPPER_URL="https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven
 
 if [ ! -f "$WRAPPER_JAR" ]; then
   echo "Downloading Maven Wrapper from $WRAPPER_URL ..."
+  mkdir -p "$WRAPPER_DIR"
   if command -v curl >/dev/null 2>&1; then
     curl -sL -o "$WRAPPER_JAR" "$WRAPPER_URL"
   elif command -v wget >/dev/null 2>&1; then
