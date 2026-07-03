@@ -1,4 +1,4 @@
-# UPI Offline Mesh â€” Demo
+# UPI Offline Mesh
 
 A Spring Boot backend that demonstrates **offline UPI payments routed through a Bluetooth-style mesh network**. You're in a basement with zero connectivity. You send your friend â‚¹500. Your phone encrypts the payment, broadcasts it to nearby phones, and the packet hops device-to-device until *some* phone walks outside, gets 4G, and silently uploads it to this backend. The backend decrypts, deduplicates, and settles.
 
@@ -258,31 +258,31 @@ upi-offline-mesh/
 +-- mvnw, mvnw.cmd                           Maven wrapper
 +-- README.md                                this file
 +-- frontend/                                React dashboard source
-¦   +-- package.json                         React/Vite scripts and dependencies
-¦   +-- vite.config.js                       builds into Spring Boot static resources
-¦   +-- src/
-¦       +-- App.jsx                          dashboard orchestration and action handlers
-¦       +-- api/dashboardApi.js              typed fetch helpers for /api endpoints
-¦       +-- components/                      dashboard panels and controls
-¦       ¦   +-- DemoControls.jsx             payment, gossip, bridge, duplicate-storm controls
-¦       ¦   +-- MeshNetwork.jsx              visual mesh topology
-¦       ¦   +-- PacketJourney.jsx            payment-to-settlement timeline
-¦       ¦   +-- AccountPanel.jsx             balances
-¦       ¦   +-- TransactionLedger.jsx        latest transaction table
-¦       +-- styles/index.css                 responsive dashboard styling
+ï¿½   +-- package.json                         React/Vite scripts and dependencies
+ï¿½   +-- vite.config.js                       builds into Spring Boot static resources
+ï¿½   +-- src/
+ï¿½       +-- App.jsx                          dashboard orchestration and action handlers
+ï¿½       +-- api/dashboardApi.js              typed fetch helpers for /api endpoints
+ï¿½       +-- components/                      dashboard panels and controls
+ï¿½       ï¿½   +-- DemoControls.jsx             payment, gossip, bridge, duplicate-storm controls
+ï¿½       ï¿½   +-- MeshNetwork.jsx              visual mesh topology
+ï¿½       ï¿½   +-- PacketJourney.jsx            payment-to-settlement timeline
+ï¿½       ï¿½   +-- AccountPanel.jsx             balances
+ï¿½       ï¿½   +-- TransactionLedger.jsx        latest transaction table
+ï¿½       +-- styles/index.css                 responsive dashboard styling
 +-- src/main/
     +-- resources/
-    ¦   +-- application.properties           H2, TTLs, bridge API key
-    ¦   +-- static/                          built React app served by Spring Boot
+    ï¿½   +-- application.properties           H2, TTLs, bridge API key
+    ï¿½   +-- static/                          built React app served by Spring Boot
     +-- java/com/demo/upimesh/
         +-- UpiMeshApplication.java          Spring Boot main class
         +-- controller/
-        ¦   +-- ApiController.java           REST endpoints
-        ¦   +-- ApiExceptionHandler.java     validation/error response mapping
-        ¦   +-- DashboardController.java     forwards / to React index.html
+        ï¿½   +-- ApiController.java           REST endpoints
+        ï¿½   +-- ApiExceptionHandler.java     validation/error response mapping
+        ï¿½   +-- DashboardController.java     forwards / to React index.html
         +-- crypto/
-        ¦   +-- ServerKeyHolder.java         generates RSA-2048 keypair on startup
-        ¦   +-- HybridCryptoService.java     RSA-OAEP + AES-256-GCM + ciphertext hash
+        ï¿½   +-- ServerKeyHolder.java         generates RSA-2048 keypair on startup
+        ï¿½   +-- HybridCryptoService.java     RSA-OAEP + AES-256-GCM + ciphertext hash
         +-- model/                           JPA entities and wire models
         +-- service/
             +-- DemoService.java             seeds accounts, simulates sender phone
