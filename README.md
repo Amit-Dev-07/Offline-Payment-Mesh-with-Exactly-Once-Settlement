@@ -1,4 +1,4 @@
-# UPI Offline Mesh
+# UPI Offline Mesh - Demo
 
 A Spring Boot backend that demonstrates **offline UPI payments routed through a Bluetooth-style mesh network**. You're in a basement with zero connectivity. You send your friend ₹500. Your phone encrypts the payment, broadcasts it to nearby phones, and the packet hops device-to-device until *some* phone walks outside, gets 4G, and silently uploads it to this backend. The backend decrypts, deduplicates, and settles.
 
@@ -158,11 +158,11 @@ This proves exactly-once settlement: even if the same encrypted packet reaches t
 └──────────────────────────────────────┬──────────────────────────────────┘
                                        │ Bluetooth gossip
                                        ▼
-        ┌─────────┐  hop   ┌─────────┐  hop   ┌─────────┐
+        ┌─────────┐  hop    ┌─────────┐  hop   ┌─────────┐
         │stranger1│ ─────▶ │stranger2│ ─────▶ │ bridge  │ ◀── walks outside
-        └─────────┘        └─────────┘        └────┬────┘     gets 4G
-                                                   │
-                                                   ▼ HTTPS POST
+        └─────────┘         └─────────┘        └────┬────┘     gets 4G
+                                                    │
+                                                    ▼ HTTPS POST
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                     SPRING BOOT BACKEND (this project)                  │
 │                                                                         │
@@ -172,7 +172,7 @@ This proves exactly-once settlement: even if the same encrypted packet reaches t
 │  [1] hash ciphertext (SHA-256)                                          │
 │       │                                                                 │
 │       ▼                                                                 │
-│  [2] IdempotencyService.claim(hash)  ◀── atomic putIfAbsent (≈ Redis    │
+│  [2] IdempotencyService.claim(hash)  ◀── atomic putIfAbsent (≈ Redis   │
 │       │                                  SETNX). Duplicates rejected    │
 │       │                                  here, before any work.         │
 │       ▼                                                                 │
@@ -432,13 +432,12 @@ I want this README to be useful to you when someone reviews the project, so let'
 3. **Bluetooth in real life is hard.** Background BLE on Android is heavily throttled since Android 8. iOS peripheral mode is locked down. Two strangers' phones reliably forming a GATT connection while the apps aren't actively open is genuinely difficult and a lot of energy. This demo skips that problem entirely by simulating the mesh.
 4. **Privacy / liability.** A stranger carries your encrypted transaction packet on their phone. They can't read it, but its existence is metadata. In a real deployment you'd want to think about regulatory disclosures and what happens if a device is seized.
 
-For a college / portfolio project: name the concept honestly as **"mesh-routed deferred settlement"** rather than "real-time offline UPI," and you'll have a much stronger pitch. The cryptography and idempotency work here is real engineering and worth showing off.
 
 ---
 
 ## Frontend development
 
-The dashboard is now a React app under `frontend/`.
+The dashboard is a React app under `frontend/`.
 
 Common commands:
 
