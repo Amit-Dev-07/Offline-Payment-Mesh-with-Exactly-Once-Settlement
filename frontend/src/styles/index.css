@@ -246,6 +246,7 @@ h2 {
 
 .top-grid,
 .content-grid,
+.ledger-grid,
 .bottom-grid {
   display: grid;
   align-items: start;
@@ -262,6 +263,10 @@ h2 {
 
 .bottom-grid {
   grid-template-columns: minmax(0, 1.15fr) minmax(330px, 0.85fr);
+}
+
+.ledger-grid {
+  grid-template-columns: 1fr;
 }
 
 .panel {
@@ -376,6 +381,12 @@ input[type="range"] {
   border-color: #b9e2e5;
 }
 
+.button.accent {
+  color: #653f00;
+  background: var(--amber-soft);
+  border-color: #efd39a;
+}
+
 .button.danger {
   color: #8c2420;
   background: var(--rose-soft);
@@ -394,6 +405,13 @@ input[type="range"] {
   color: var(--rose);
   font-size: 13px;
   font-weight: 700;
+}
+
+.error-note {
+  padding: 10px 12px;
+  background: var(--rose-soft);
+  border: 1px solid #f4c6c3;
+  border-radius: 8px;
 }
 
 .mesh-board {
@@ -548,9 +566,66 @@ input[type="range"] {
 
 .account-list,
 .activity-list,
+.journey-list,
 .key-grid {
   display: grid;
   gap: 10px;
+}
+
+.journey-step {
+  display: grid;
+  grid-template-columns: 30px 34px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 12px;
+  background: var(--surface-soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.journey-index,
+.journey-icon {
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+}
+
+.journey-index {
+  width: 30px;
+  height: 30px;
+  color: var(--muted);
+  background: #eef1f4;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.journey-icon {
+  width: 34px;
+  height: 34px;
+  color: var(--muted);
+  background: #eef1f4;
+}
+
+.journey-step.done .journey-icon {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.journey-step.active .journey-icon {
+  color: var(--blue);
+  background: var(--blue-soft);
+}
+
+.journey-step strong {
+  display: block;
+  font-size: 14px;
+}
+
+.journey-step p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
 }
 
 .account-row {
@@ -824,6 +899,7 @@ code {
 
   .top-grid,
   .content-grid,
+  .ledger-grid,
   .bottom-grid {
     grid-template-columns: 1fr;
   }

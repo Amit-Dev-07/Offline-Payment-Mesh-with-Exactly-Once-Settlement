@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Simulates the Bluetooth mesh.
@@ -25,6 +26,8 @@ public class MeshSimulatorService {
     private static final Logger log = LoggerFactory.getLogger(MeshSimulatorService.class);
 
     private final Map<String, VirtualDevice> devices = new ConcurrentHashMap<>();
+    private final AtomicInteger offlineSequence = new AtomicInteger(4);
+    private final AtomicInteger bridgeSequence = new AtomicInteger(2);
 
     public MeshSimulatorService() {
         // Default scenario: 4 offline phones in a basement, 1 phone outside with 4G
@@ -32,6 +35,9 @@ public class MeshSimulatorService {
     }
 
     private void seedDefaultDevices() {
+        devices.clear();
+        offlineSequence.set(4);
+        bridgeSequence.set(2);
         devices.put("phone-alice",   new VirtualDevice("phone-alice",   false));
         devices.put("phone-stranger1", new VirtualDevice("phone-stranger1", false));
         devices.put("phone-stranger2", new VirtualDevice("phone-stranger2", false));
@@ -99,6 +105,14 @@ public class MeshSimulatorService {
         return new GossipResult(transfers, snapshotMap());
     }
 
+    public GossipResult gossipRounds(int rounds) {
+        int totalTransfers = 0;
+        for (int i = 0; i < rounds; i++) {
+            totalTransfers += gossipOnce().transfers();
+        }
+        return new GossipResult(totalTransfers, snapshotMap());
+    }
+
     public Map<String, Integer> snapshotMap() {
         Map<String, Integer> m = new LinkedHashMap<>();
         for (VirtualDevice d : devices.values()) {
@@ -124,6 +138,34 @@ public class MeshSimulatorService {
 
     public void resetMesh() {
         devices.values().forEach(VirtualDevice::clear);
+    }
+
+    public VirtualDevice addDevice(boolean hasInternet) {
+        String prefix = hasInternet ? "phone-bridge-" : "phone-offline-";
+        AtomicInteger sequence = hasInternet ? bridgeSequence : offlineSequence;
+
+        String id;
+        do {
+            id = prefix + sequence.getAndIncrement();
+        } while (devices.containsKey(id));
+
+        VirtualDevice device = new VirtualDevice(id, hasInternet);
+        devices.put(id, device);
+        log.info("Added {} mesh device {}", hasInternet ? "bridge" : "offline", id);
+        return device;
+    }
+
+    public void seedDuplicateStormTopology() {
+        seedDefaultDevices();
+        devices.put("phone-bridge-2", new VirtualDevice("phone-bridge-2", true));
+        devices.put("phone-bridge-3", new VirtualDevice("phone-bridge-3", true));
+        bridgeSequence.set(4);
+    }
+
+    public int bridgeCount() {
+        return (int) devices.values().stream()
+                .filter(VirtualDevice::hasInternet)
+                .count();
     }
 
     public record GossipResult(int transfers, Map<String, Integer> deviceCounts) {}

@@ -46,10 +46,31 @@ export function runGossipRound() {
   return request('/api/mesh/gossip', { method: 'POST' });
 }
 
+export function runGossipRounds(rounds) {
+  return request('/api/mesh/gossip-rounds', {
+    method: 'POST',
+    body: JSON.stringify({ rounds }),
+  });
+}
+
 export function flushBridgeNodes() {
   return request('/api/mesh/flush', { method: 'POST' });
 }
 
 export function resetMeshState() {
   return request('/api/mesh/reset', { method: 'POST' });
+}
+
+export function addMeshDevice(hasInternet) {
+  return request('/api/mesh/devices', {
+    method: 'POST',
+    body: JSON.stringify({ hasInternet }),
+  });
+}
+
+export function simulateDuplicateStorm(payload) {
+  return request('/api/mesh/duplicate-storm', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
 }

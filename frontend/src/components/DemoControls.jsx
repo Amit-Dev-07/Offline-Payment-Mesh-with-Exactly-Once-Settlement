@@ -1,4 +1,13 @@
-import { Loader2, RefreshCcw, Repeat2, Send, UploadCloud } from 'lucide-react';
+import {
+  Loader2,
+  RadioTower,
+  RefreshCcw,
+  Repeat2,
+  Send,
+  Smartphone,
+  Sparkles,
+  UploadCloud,
+} from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 function pickDefaultReceiver(vpas, sender) {
@@ -10,10 +19,15 @@ export default function DemoControls({
   devices,
   isBusy,
   runningAction,
+  actionError,
   onSend,
   onGossip,
+  onGossipRounds,
   onFlush,
   onReset,
+  onAddBridge,
+  onAddOffline,
+  onDuplicateStorm,
 }) {
   const vpas = useMemo(() => accounts.map((account) => account.vpa), [accounts]);
   const deviceIds = useMemo(() => devices.map((device) => device.deviceId), [devices]);
@@ -68,6 +82,20 @@ export default function DemoControls({
       ttl: Number(form.ttl),
       startDevice: form.startDevice,
     });
+  };
+
+  const currentPayload = () => ({
+    senderVpa: form.senderVpa,
+    receiverVpa: form.receiverVpa,
+    amount,
+    pin: form.pin.trim(),
+    ttl: Number(form.ttl),
+    startDevice: form.startDevice,
+  });
+
+  const triggerDuplicateStorm = () => {
+    if (!canSend || isBusy) return;
+    onDuplicateStorm(currentPayload());
   };
 
   return (
@@ -152,9 +180,25 @@ export default function DemoControls({
           {runningAction === 'gossip' ? <Loader2 className="spin" size={18} /> : <Repeat2 size={18} />}
           Gossip
         </button>
+        <button className="button secondary" type="button" onClick={() => onGossipRounds(3)} disabled={isBusy}>
+          {runningAction === 'gossip-3' ? <Loader2 className="spin" size={18} /> : <Repeat2 size={18} />}
+          Run 3 rounds
+        </button>
         <button className="button secondary" type="button" onClick={onFlush} disabled={isBusy}>
           {runningAction === 'flush' ? <Loader2 className="spin" size={18} /> : <UploadCloud size={18} />}
           Flush bridges
+        </button>
+        <button className="button secondary" type="button" onClick={onAddOffline} disabled={isBusy}>
+          {runningAction === 'add-offline' ? <Loader2 className="spin" size={18} /> : <Smartphone size={18} />}
+          Add offline
+        </button>
+        <button className="button secondary" type="button" onClick={onAddBridge} disabled={isBusy}>
+          {runningAction === 'add-bridge' ? <Loader2 className="spin" size={18} /> : <RadioTower size={18} />}
+          Add bridge
+        </button>
+        <button className="button accent" type="button" onClick={triggerDuplicateStorm} disabled={!canSend || isBusy}>
+          {runningAction === 'duplicate-storm' ? <Loader2 className="spin" size={18} /> : <Sparkles size={18} />}
+          Duplicate storm
         </button>
         <button className="button danger" type="button" onClick={onReset} disabled={isBusy}>
           {runningAction === 'reset' ? <Loader2 className="spin" size={18} /> : <RefreshCcw size={18} />}
@@ -162,6 +206,9 @@ export default function DemoControls({
         </button>
       </div>
 
+      {actionError && (
+        <p className="form-note error-note">{actionError}</p>
+      )}
       {form.senderVpa === form.receiverVpa && (
         <p className="form-note">Sender and receiver must be different.</p>
       )}
