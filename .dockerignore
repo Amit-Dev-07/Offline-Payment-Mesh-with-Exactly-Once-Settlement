@@ -1,0 +1,11 @@
+target/
+frontend/node_modules/
+frontend/dist/
+.git/
+.agents/
+.codex/
+.idea/
+.vscode/
+*.iml
+*.log
+README.md
