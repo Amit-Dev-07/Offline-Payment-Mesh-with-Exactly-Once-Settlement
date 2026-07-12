@@ -9,7 +9,7 @@ export default function AppHeader({ isRefreshing }) {
         </div>
         <div>
           <p className="eyebrow">Offline settlement simulator</p>
-          <h1>UPI Offline Mesh</h1>
+          <h1>UPI Offline Mesh-Demo</h1>
         </div>
       </div>
 
