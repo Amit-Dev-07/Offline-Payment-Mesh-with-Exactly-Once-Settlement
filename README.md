@@ -258,31 +258,31 @@ upi-offline-mesh/
 +-- mvnw, mvnw.cmd                           Maven wrapper
 +-- README.md                                this file
 +-- frontend/                                React dashboard source
-�   +-- package.json                         React/Vite scripts and dependencies
-�   +-- vite.config.js                       builds into Spring Boot static resources
-�   +-- src/
-�       +-- App.jsx                          dashboard orchestration and action handlers
-�       +-- api/dashboardApi.js              typed fetch helpers for /api endpoints
-�       +-- components/                      dashboard panels and controls
-�       �   +-- DemoControls.jsx             payment, gossip, bridge, duplicate-storm controls
-�       �   +-- MeshNetwork.jsx              visual mesh topology
-�       �   +-- PacketJourney.jsx            payment-to-settlement timeline
-�       �   +-- AccountPanel.jsx             balances
-�       �   +-- TransactionLedger.jsx        latest transaction table
-�       +-- styles/index.css                 responsive dashboard styling
+     +-- package.json                         React/Vite scripts and dependencies
+     +-- vite.config.js                       builds into Spring Boot static resources
+     +-- src/
+         +-- App.jsx                          dashboard orchestration and action handlers
+         +-- api/dashboardApi.js              typed fetch helpers for /api endpoints
+         +-- components/                      dashboard panels and controls
+              +-- DemoControls.jsx             payment, gossip, bridge, duplicate-storm controls
+              +-- MeshNetwork.jsx              visual mesh topology
+              +-- PacketJourney.jsx            payment-to-settlement timeline
+              +-- AccountPanel.jsx             balances
+              +-- TransactionLedger.jsx        latest transaction table
+         +-- styles/index.css                 responsive dashboard styling
 +-- src/main/
     +-- resources/
-    �   +-- application.properties           H2, TTLs, bridge API key
-    �   +-- static/                          built React app served by Spring Boot
+         +-- application.properties           H2, TTLs, bridge API key
+         +-- static/                          built React app served by Spring Boot
     +-- java/com/demo/upimesh/
         +-- UpiMeshApplication.java          Spring Boot main class
         +-- controller/
-        �   +-- ApiController.java           REST endpoints
-        �   +-- ApiExceptionHandler.java     validation/error response mapping
-        �   +-- DashboardController.java     forwards / to React index.html
+             +-- ApiController.java           REST endpoints
+             +-- ApiExceptionHandler.java     validation/error response mapping
+             +-- DashboardController.java     forwards / to React index.html
         +-- crypto/
-        �   +-- ServerKeyHolder.java         generates RSA-2048 keypair on startup
-        �   +-- HybridCryptoService.java     RSA-OAEP + AES-256-GCM + ciphertext hash
+             +-- ServerKeyHolder.java         generates RSA-2048 keypair on startup
+             +-- HybridCryptoService.java     RSA-OAEP + AES-256-GCM + ciphertext hash
         +-- model/                           JPA entities and wire models
         +-- service/
             +-- DemoService.java             seeds accounts, simulates sender phone
@@ -477,7 +477,3 @@ mvnw.cmd -Pfrontend package
 **Tests fail intermittently** — The concurrency test is timing-sensitive. If it ever flakes, run it 3x; if it consistently fails on your hardware, file the actual failure output.
 
 ---
-
-## License
-
-Demo code, no license. Use it however you want for learning.
