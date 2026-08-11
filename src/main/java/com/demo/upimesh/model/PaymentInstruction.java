@@ -8,7 +8,7 @@ import java.math.BigDecimal;
  *
  * Critical fields for security:
  *   - nonce: a UUID unique to this payment. Even if everything else were identical
- *            for two legitimate payments (alice sends bob ₹100 twice), the nonces
+ *            for two legitimate payments (Amit sends Priya Rs. 100 twice), the nonces
  *            differ, so the resulting ciphertexts and their hashes also differ.
  *   - signedAt: lets the server reject stale packets ("freshness window"). Without
  *               this, an attacker who got the ciphertext could replay it weeks later.

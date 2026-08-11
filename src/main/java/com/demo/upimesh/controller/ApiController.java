@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -68,7 +69,7 @@ public class ApiController {
                 req.ttl == null ? 5 : req.ttl);
 
         String startDevice = req.startDevice == null || req.startDevice.isBlank()
-                ? "phone-alice"
+                ? "phone-amit"
                 : req.startDevice;
         mesh.inject(startDevice, packet);
 
@@ -116,9 +117,19 @@ public class ApiController {
         );
     }
 
+    @DeleteMapping("/mesh/devices")
+    public Map<String, Object> removeMeshDevice(@Valid @RequestBody RemoveMeshDeviceRequest req) {
+        VirtualDevice device = mesh.removeDevice(req.hasInternet);
+        return Map.of(
+                "status", req.hasInternet ? "bridge node removed" : "offline node removed",
+                "device", devicePayload(device),
+                "bridgeCount", mesh.bridgeCount()
+        );
+    }
+
     @PostMapping("/mesh/duplicate-storm")
     public Map<String, Object> duplicateStorm(@Valid @RequestBody DemoSendRequest req) throws Exception {
-        req.startDevice = "phone-alice";
+        req.startDevice = "phone-amit";
         validatePaymentRequest(req);
         mesh.seedDuplicateStormTopology();
         idempotency.clear();
@@ -126,14 +137,14 @@ public class ApiController {
         MeshPacket packet = demo.createPacket(
                 req.senderVpa, req.receiverVpa, req.amount, req.pin,
                 req.ttl == null ? 5 : req.ttl);
-        mesh.inject("phone-alice", packet);
+        mesh.inject("phone-amit", packet);
 
         MeshSimulatorService.GossipResult gossipResult = mesh.gossipRounds(2);
         FlushSummary flush = flushBridgeUploads();
 
         return Map.of(
                 "packetId", packet.getPacketId(),
-                "injectedAt", "phone-alice",
+                "injectedAt", "phone-amit",
                 "rounds", 2,
                 "gossipTransfers", gossipResult.transfers(),
                 "bridgeCount", mesh.bridgeCount(),
@@ -198,10 +209,19 @@ public class ApiController {
         }
 
         String startDevice = req.startDevice == null || req.startDevice.isBlank()
-                ? "phone-alice"
+                ? "phone-amit"
                 : req.startDevice;
         if (mesh.getDevice(startDevice) == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unknown start device: " + startDevice);
+        }
+
+        Account sender = accountRepo.findById(req.senderVpa).orElseThrow();
+        if (sender.getBalance().compareTo(req.amount) < 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Insufficient balance: " + req.senderVpa + " has Rs. "
+                            + sender.getBalance() + ", but the send amount is Rs. " + req.amount
+            );
         }
     }
 
@@ -270,6 +290,11 @@ public class ApiController {
     }
 
     public static class AddMeshDeviceRequest {
+        @NotNull(message = "Device type is required")
+        public Boolean hasInternet;
+    }
+
+    public static class RemoveMeshDeviceRequest {
         @NotNull(message = "Device type is required")
         public Boolean hasInternet;
     }

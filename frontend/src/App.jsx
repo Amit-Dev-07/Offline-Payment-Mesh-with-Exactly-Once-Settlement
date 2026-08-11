@@ -3,6 +3,7 @@ import { AlertTriangle, Loader2, RefreshCcw } from 'lucide-react';
 import {
   addMeshDevice,
   flushBridgeNodes,
+  removeMeshDevice,
   resetMeshState,
   runGossipRound,
   runGossipRounds,
@@ -240,6 +241,22 @@ export default function App() {
     );
   }, [runAction]);
 
+  const handleRemoveBridge = useCallback(() => {
+    runAction(
+      'remove-bridge',
+      () => removeMeshDevice(true),
+      (result) => `${result.device.deviceId} removed from bridge nodes.`,
+    );
+  }, [runAction]);
+
+  const handleRemoveOffline = useCallback(() => {
+    runAction(
+      'remove-offline',
+      () => removeMeshDevice(false),
+      (result) => `${result.device.deviceId} removed from offline relays.`,
+    );
+  }, [runAction]);
+
   const handleDuplicateStorm = useCallback((payload) => {
     runAction(
       'duplicate-storm',
@@ -311,6 +328,8 @@ export default function App() {
               onReset={handleReset}
               onAddBridge={handleAddBridge}
               onAddOffline={handleAddOffline}
+              onRemoveBridge={handleRemoveBridge}
+              onRemoveOffline={handleRemoveOffline}
               onDuplicateStorm={handleDuplicateStorm}
             />
             <MeshNetwork devices={data.mesh?.devices || []} />

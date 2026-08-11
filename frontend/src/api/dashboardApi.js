@@ -68,6 +68,13 @@ export function addMeshDevice(hasInternet) {
   });
 }
 
+export function removeMeshDevice(hasInternet) {
+  return request('/api/mesh/devices', {
+    method: 'DELETE',
+    body: JSON.stringify({ hasInternet }),
+  });
+}
+
 export function simulateDuplicateStorm(payload) {
   return request('/api/mesh/duplicate-storm', {
     method: 'POST',

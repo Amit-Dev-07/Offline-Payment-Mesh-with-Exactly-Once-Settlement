@@ -26,7 +26,7 @@ public class MeshSimulatorService {
     private static final Logger log = LoggerFactory.getLogger(MeshSimulatorService.class);
 
     private final Map<String, VirtualDevice> devices = new ConcurrentHashMap<>();
-    private final AtomicInteger offlineSequence = new AtomicInteger(4);
+    private final AtomicInteger offlineSequence = new AtomicInteger(5);
     private final AtomicInteger bridgeSequence = new AtomicInteger(2);
 
     public MeshSimulatorService() {
@@ -36,13 +36,13 @@ public class MeshSimulatorService {
 
     private void seedDefaultDevices() {
         devices.clear();
-        offlineSequence.set(4);
+        offlineSequence.set(5);
         bridgeSequence.set(2);
-        devices.put("phone-alice",   new VirtualDevice("phone-alice",   false));
-        devices.put("phone-stranger1", new VirtualDevice("phone-stranger1", false));
-        devices.put("phone-stranger2", new VirtualDevice("phone-stranger2", false));
-        devices.put("phone-stranger3", new VirtualDevice("phone-stranger3", false));
-        devices.put("phone-bridge",  new VirtualDevice("phone-bridge",  true));
+        devices.put("phone-amit", new VirtualDevice("phone-amit", false));
+        devices.put("phone-priya", new VirtualDevice("phone-priya", false));
+        devices.put("phone-rahul", new VirtualDevice("phone-rahul", false));
+        devices.put("phone-neha", new VirtualDevice("phone-neha", false));
+        devices.put("phone-bridge-mumbai", new VirtualDevice("phone-bridge-mumbai", true));
     }
 
     public Collection<VirtualDevice> getDevices() {
@@ -140,6 +140,10 @@ public class MeshSimulatorService {
         devices.values().forEach(VirtualDevice::clear);
     }
 
+    public void resetTopology() {
+        seedDefaultDevices();
+    }
+
     public VirtualDevice addDevice(boolean hasInternet) {
         String prefix = hasInternet ? "phone-bridge-" : "phone-offline-";
         AtomicInteger sequence = hasInternet ? bridgeSequence : offlineSequence;
@@ -153,6 +157,24 @@ public class MeshSimulatorService {
         devices.put(id, device);
         log.info("Added {} mesh device {}", hasInternet ? "bridge" : "offline", id);
         return device;
+    }
+
+    public VirtualDevice removeDevice(boolean hasInternet) {
+        List<VirtualDevice> matchingDevices = devices.values().stream()
+                .filter(device -> device.hasInternet() == hasInternet)
+                .sorted(Comparator.comparing(VirtualDevice::getDeviceId).reversed())
+                .toList();
+
+        if (matchingDevices.size() <= 1) {
+            throw new IllegalArgumentException(hasInternet
+                    ? "At least one bridge node is required for settlement"
+                    : "At least one offline node is required to inject a packet");
+        }
+
+        VirtualDevice removed = matchingDevices.get(0);
+        devices.remove(removed.getDeviceId());
+        log.info("Removed {} mesh device {}", hasInternet ? "bridge" : "offline", removed.getDeviceId());
+        return removed;
     }
 
     public void seedDuplicateStormTopology() {

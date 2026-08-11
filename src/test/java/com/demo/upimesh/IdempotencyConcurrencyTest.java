@@ -51,12 +51,12 @@ class IdempotencyConcurrencyTest {
     @Test
     void singlePacketDeliveredByThreeBridgesSettlesExactlyOnce() throws Exception {
         // Capture starting balances
-        BigDecimal aliceBefore = accounts.findById("alice@demo").orElseThrow().getBalance();
-        BigDecimal bobBefore = accounts.findById("bob@demo").orElseThrow().getBalance();
+        BigDecimal amitBefore = accounts.findById("amit@upi").orElseThrow().getBalance();
+        BigDecimal priyaBefore = accounts.findById("priya@upi").orElseThrow().getBalance();
 
         // One packet, but we'll deliver it from 3 "bridges" simultaneously
         MeshPacket packet = demoService.createPacket(
-                "alice@demo", "bob@demo", new BigDecimal("100.00"), "1234", 5);
+                "amit@upi", "priya@upi", new BigDecimal("100.00"), "1234", 5);
 
         ExecutorService pool = Executors.newFixedThreadPool(3);
         CountDownLatch start = new CountDownLatch(1);
@@ -84,16 +84,16 @@ class IdempotencyConcurrencyTest {
         assertEquals(2, duplicates.get(), "the other two should be duplicates");
 
         // Balance moved exactly once
-        BigDecimal aliceAfter = accounts.findById("alice@demo").orElseThrow().getBalance();
-        BigDecimal bobAfter = accounts.findById("bob@demo").orElseThrow().getBalance();
-        assertEquals(aliceBefore.subtract(new BigDecimal("100.00")), aliceAfter);
-        assertEquals(bobBefore.add(new BigDecimal("100.00")), bobAfter);
+        BigDecimal amitAfter = accounts.findById("amit@upi").orElseThrow().getBalance();
+        BigDecimal priyaAfter = accounts.findById("priya@upi").orElseThrow().getBalance();
+        assertEquals(amitBefore.subtract(new BigDecimal("100.00")), amitAfter);
+        assertEquals(priyaBefore.add(new BigDecimal("100.00")), priyaAfter);
     }
 
     @Test
     void tamperedCiphertextIsRejected() throws Exception {
         MeshPacket packet = demoService.createPacket(
-                "alice@demo", "bob@demo", new BigDecimal("50.00"), "1234", 5);
+                "amit@upi", "priya@upi", new BigDecimal("50.00"), "1234", 5);
 
         // Flip a byte in the middle of the ciphertext
         char[] chars = packet.getCiphertext().toCharArray();
@@ -107,7 +107,7 @@ class IdempotencyConcurrencyTest {
     @Test
     void encryptDecryptRoundTrip() throws Exception {
         PaymentInstruction original = new PaymentInstruction(
-                "alice@demo", "bob@demo", new BigDecimal("123.45"),
+                "amit@upi", "priya@upi", new BigDecimal("123.45"),
                 "abcdef", "nonce-1", System.currentTimeMillis());
 
         String ct = crypto.encrypt(original, serverKey.getPublicKey());
@@ -122,7 +122,7 @@ class IdempotencyConcurrencyTest {
     @Test
     void bridgeIngestRequiresApiKey() throws Exception {
         MeshPacket packet = demoService.createPacket(
-                "alice@demo", "bob@demo", new BigDecimal("10.00"), "1234", 5);
+                "amit@upi", "priya@upi", new BigDecimal("10.00"), "1234", 5);
 
         String json = objectMapper.writeValueAsString(packet);
 
@@ -145,12 +145,12 @@ class IdempotencyConcurrencyTest {
     @Test
     void demoSendRejectsInvalidPaymentInput() throws Exception {
         Map<String, Object> body = Map.of(
-                "senderVpa", "alice@demo",
-                "receiverVpa", "alice@demo",
+                "senderVpa", "amit@upi",
+                "receiverVpa", "amit@upi",
                 "amount", 100,
                 "pin", "1234",
                 "ttl", 5,
-                "startDevice", "phone-alice");
+                "startDevice", "phone-amit");
 
         mockMvc.perform(post("/api/demo/send")
                         .contentType("application/json")

@@ -6,6 +6,7 @@ import {
   Send,
   Smartphone,
   Sparkles,
+  Trash2,
   UploadCloud,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -27,6 +28,8 @@ export default function DemoControls({
   onReset,
   onAddBridge,
   onAddOffline,
+  onRemoveBridge,
+  onRemoveOffline,
   onDuplicateStorm,
 }) {
   const vpas = useMemo(() => accounts.map((account) => account.vpa), [accounts]);
@@ -44,7 +47,9 @@ export default function DemoControls({
     setForm((current) => {
       const senderVpa = current.senderVpa || vpas[0] || '';
       const receiverVpa = current.receiverVpa || pickDefaultReceiver(vpas, senderVpa);
-      const startDevice = current.startDevice || deviceIds[0] || 'phone-alice';
+      const startDevice = deviceIds.includes(current.startDevice)
+        ? current.startDevice
+        : deviceIds[0] || 'phone-amit';
 
       return {
         ...current,
@@ -56,12 +61,23 @@ export default function DemoControls({
   }, [deviceIds, vpas]);
 
   const amount = Number(form.amount);
-  const canSend = form.senderVpa
-    && form.receiverVpa
-    && form.senderVpa !== form.receiverVpa
-    && Number.isFinite(amount)
-    && amount > 0
-    && form.pin.trim().length >= 4;
+  const selectedSender = useMemo(
+    () => accounts.find((account) => account.vpa === form.senderVpa),
+    [accounts, form.senderVpa],
+  );
+  const senderBalance = Number(selectedSender?.balance || 0);
+  const validationMessage = useMemo(() => {
+    if (!form.senderVpa || !form.receiverVpa) return 'Select sender and receiver accounts.';
+    if (form.senderVpa === form.receiverVpa) return 'Sender and receiver must be different.';
+    if (!Number.isFinite(amount) || amount <= 0) return 'Amount must be greater than zero.';
+    if (amount > senderBalance) {
+      return `${form.senderVpa} has only Rs. ${senderBalance.toFixed(2)} available. Reduce the amount.`;
+    }
+    if (form.pin.trim().length < 4) return 'PIN must be at least 4 digits.';
+    if (!form.startDevice) return 'Select a start device before injecting the packet.';
+    return '';
+  }, [amount, form.pin, form.receiverVpa, form.senderVpa, form.startDevice, senderBalance]);
+  const canSend = !validationMessage;
 
   const updateField = (field) => (event) => {
     setForm((current) => ({
@@ -158,7 +174,7 @@ export default function DemoControls({
         </label>
 
         <label className="ttl-control">
-          TTL
+          TTL hops
           <span>{form.ttl}</span>
           <input
             type="range"
@@ -192,9 +208,17 @@ export default function DemoControls({
           {runningAction === 'add-offline' ? <Loader2 className="spin" size={18} /> : <Smartphone size={18} />}
           Add offline
         </button>
+        <button className="button danger" type="button" onClick={onRemoveOffline} disabled={isBusy}>
+          {runningAction === 'remove-offline' ? <Loader2 className="spin" size={18} /> : <Trash2 size={18} />}
+          Delete offline
+        </button>
         <button className="button secondary" type="button" onClick={onAddBridge} disabled={isBusy}>
           {runningAction === 'add-bridge' ? <Loader2 className="spin" size={18} /> : <RadioTower size={18} />}
           Add bridge
+        </button>
+        <button className="button danger" type="button" onClick={onRemoveBridge} disabled={isBusy}>
+          {runningAction === 'remove-bridge' ? <Loader2 className="spin" size={18} /> : <Trash2 size={18} />}
+          Delete bridge
         </button>
         <button className="button accent" type="button" onClick={triggerDuplicateStorm} disabled={!canSend || isBusy}>
           {runningAction === 'duplicate-storm' ? <Loader2 className="spin" size={18} /> : <Sparkles size={18} />}
@@ -209,8 +233,8 @@ export default function DemoControls({
       {actionError && (
         <p className="form-note error-note">{actionError}</p>
       )}
-      {form.senderVpa === form.receiverVpa && (
-        <p className="form-note">Sender and receiver must be different.</p>
+      {validationMessage && (
+        <p className="form-note">{validationMessage}</p>
       )}
     </section>
   );

@@ -20,22 +20,29 @@ import java.security.spec.MGF1ParameterSpec;
 import java.util.Base64;
 
 /**
- * Hybrid encryption — the same pattern used by TLS, PGP, Signal, etc.
+ * Hybrid encryption — the same approach used in protocols such as TLS, PGP, and Signal.
  *
- * Why hybrid? RSA can only encrypt small data (~245 bytes for a 2048-bit key).
- * Our payment instruction (JSON) might be ~300 bytes, and in real use we might
- * include device certificates and signatures pushing it well over.
+ * Why hybrid? RSA can only encrypt a limited amount of data.
+ * With a 2048-bit RSA key and OAEP using SHA-256, the maximum plaintext size
+ * is 190 bytes. A payment instruction (JSON) can easily exceed this limit,
+ * especially when certificates, signatures, or additional metadata are included.
  *
- * Solution: generate a fresh AES key per packet, encrypt the JSON with AES-GCM
- * (fast + authenticated), then encrypt JUST the AES key with RSA-OAEP.
+ * Therefore, a fresh AES-256 key is generated for each packet. The payment
+ * instruction is encrypted using AES-GCM (fast, authenticated encryption),
+ * and only the 32-byte AES key is encrypted using the server's RSA public key
+ * with OAEP padding.
  *
- * Wire format (after base64 encoding):
- *   [ 256 bytes RSA-encrypted AES key ][ 12 bytes GCM IV ][ ciphertext + 16-byte tag ]
+ * Wire format (before Base64 encoding):
+ *   [ 256-byte RSA-encrypted AES key ][ 12-byte GCM IV ][ AES-GCM ciphertext + 16-byte authentication tag ]
  *
- * AES-GCM is authenticated encryption: any single-bit tampering with the ciphertext
- * causes decryption to fail with an exception. This is what makes it safe for
- * untrusted intermediates to hold.
+ * The complete byte array is then Base64-encoded for transmission.
+ *
+ * AES-GCM provides both confidentiality and integrity. Any modification to the
+ * ciphertext, IV, or authentication tag causes decryption to fail with an
+ * authentication exception, making it safe for untrusted intermediaries to
+ * store or forward encrypted packets.
  */
+
 @Service
 public class HybridCryptoService {
 
